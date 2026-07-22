@@ -367,6 +367,9 @@
     const boardEl = document.getElementById("scoreboard");
     const refreshBtn = document.getElementById("refreshBtn");
 
+    let activeRequest = 0;
+    let abortController = null;
+
     function splitCsvLine(line) {
       return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map((cell) =>
         cell.trim().replace(/^"|"$/g, "").replace(/""/g, '"')
@@ -430,21 +433,44 @@
         .join("");
     }
 
+    function sheetUrl() {
+      // Bust browser/CDN cache so each Refresh gets the latest published CSV
+      const sep = API_URL.includes("?") ? "&" : "?";
+      return `${API_URL}${sep}cb=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+
     async function loadData() {
+      if (abortController) abortController.abort();
+      abortController = new AbortController();
+
+      const requestId = ++activeRequest;
       refreshBtn.disabled = true;
       refreshBtn.classList.add("is-loading");
 
       try {
-        const res = await fetch(API_URL, { cache: "no-store" });
+        const res = await fetch(sheetUrl(), {
+          cache: "no-store",
+          signal: abortController.signal,
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        });
         if (!res.ok) throw new Error("HTTP " + res.status);
+
         const csv = await res.text();
+        if (requestId !== activeRequest) return; // ignore outdated response
         renderRows(parseCsv(csv));
       } catch (err) {
+        if (err.name === "AbortError") return;
         console.error(err);
+        if (requestId !== activeRequest) return;
         boardEl.innerHTML = '<div class="empty">Unable to load scores</div>';
       } finally {
-        refreshBtn.disabled = false;
-        refreshBtn.classList.remove("is-loading");
+        if (requestId === activeRequest) {
+          refreshBtn.disabled = false;
+          refreshBtn.classList.remove("is-loading");
+        }
       }
     }
 
