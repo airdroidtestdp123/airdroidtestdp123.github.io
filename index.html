@@ -4,293 +4,133 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LVB Scoreboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --navy: #0b2a6f;
-      --blue: #1a56db;
-      --blue-bright: #3b82f6;
-      --blue-soft: #60a5fa;
-      --ice: #e8f1ff;
-      --white: #ffffff;
-      --ink: #0f274f;
-      --muted: #5b7399;
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --lvb-blue: #0a4a6e;
+      --lvb-blue-top: #17628a;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; }
 
     body {
+      margin: 0;
       min-height: 100vh;
-      font-family: "Figtree", sans-serif;
-      color: var(--ink);
-      background: var(--white);
-      overflow-x: hidden;
-    }
-
-    .stage {
-      position: relative;
-      min-height: 100vh;
-      padding: clamp(1.5rem, 4vw, 3rem);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(ellipse 70% 50% at 50% -5%, rgba(59, 130, 246, 0.22), transparent 55%),
-        radial-gradient(ellipse 45% 35% at 100% 100%, rgba(11, 42, 111, 0.1), transparent 50%),
-        radial-gradient(ellipse 40% 30% at 0% 90%, rgba(96, 165, 250, 0.16), transparent 45%),
-        linear-gradient(180deg, #ffffff 0%, #f3f7ff 48%, #eaf1ff 100%);
+        radial-gradient(ellipse at top, #1e3a5f 0%, transparent 55%),
+        var(--bg);
+      padding: 2rem 1.25rem 3rem;
     }
 
-    .stage::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(26, 86, 219, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(26, 86, 219, 0.05) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
-      pointer-events: none;
-      animation: gridDrift 28s linear infinite;
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
     }
 
-    @keyframes gridDrift {
-      from { background-position: 0 0, 0 0; }
-      to { background-position: 48px 48px, 48px 48px; }
-    }
-
-    .glow {
-      position: absolute;
-      width: 42vmin;
-      height: 42vmin;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.28;
-      pointer-events: none;
-      animation: floatGlow 12s ease-in-out infinite;
-    }
-
-    .glow-a {
-      top: 8%;
-      left: 12%;
-      background: var(--blue-bright);
-    }
-
-    .glow-b {
-      bottom: 10%;
-      right: 8%;
-      background: var(--navy);
-      animation-delay: -4s;
-    }
-
-    @keyframes floatGlow {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(4%, -6%) scale(1.08); }
-    }
-
-    .brand {
-      position: relative;
-      z-index: 1;
+    header {
       text-align: center;
-      margin-bottom: clamp(2rem, 5vw, 3.5rem);
-      animation: riseIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+      margin-bottom: 1.75rem;
     }
 
     .brand-mark {
       display: inline-block;
-      font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(4.5rem, 14vw, 8.5rem);
-      line-height: 0.9;
-      letter-spacing: 0.08em;
-      background: linear-gradient(135deg, #ffffff 0%, #dbeafe 28%, var(--blue-soft) 55%, var(--blue) 78%, var(--navy) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      filter: drop-shadow(0 8px 24px rgba(26, 86, 219, 0.28));
+      margin: 0 auto 0.85rem;
+      padding: 0.55rem 1.6rem 0.45rem;
+      font-size: clamp(2.8rem, 8vw, 4.2rem);
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      line-height: 1;
+      color: #ffffff;
+      background:
+        radial-gradient(ellipse 120% 80% at 50% -20%, var(--lvb-blue-top) 0%, transparent 55%),
+        var(--lvb-blue);
+      border-radius: 2px;
     }
 
     .brand-sub {
-      margin-top: 0.35rem;
-      font-size: clamp(0.85rem, 2vw, 1.05rem);
-      font-weight: 600;
-      letter-spacing: 0.35em;
+      margin: 0 0 1rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--blue);
     }
 
     .refresh-btn {
-      margin-top: 1.25rem;
       appearance: none;
-      border: 1px solid rgba(26, 86, 219, 0.28);
-      background: linear-gradient(180deg, #ffffff 0%, #eef4ff 100%);
-      color: var(--navy);
-      font-family: "Figtree", sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      padding: 0.7rem 1.4rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 600;
+      padding: 0.55rem 1.15rem;
+      border-radius: 8px;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      box-shadow: 0 8px 20px rgba(11, 42, 111, 0.08);
     }
 
     .refresh-btn:hover {
-      transform: translateY(-2px);
-      border-color: rgba(26, 86, 219, 0.55);
-      box-shadow: 0 12px 28px rgba(11, 42, 111, 0.14);
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     .refresh-btn:disabled {
       opacity: 0.65;
       cursor: wait;
-      transform: none;
     }
 
     #scoreboard {
-      position: relative;
-      z-index: 1;
-      width: min(960px, 100%);
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: clamp(1rem, 3vw, 1.75rem);
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
     }
 
-    .panel {
-      position: relative;
-      padding: 1.75rem 1.6rem 1.5rem;
-      border-radius: 4px;
-      background: linear-gradient(160deg, #ffffff 0%, #f7faff 100%);
-      border: 1px solid rgba(26, 86, 219, 0.14);
-      box-shadow: 0 18px 40px rgba(11, 42, 111, 0.08);
-      overflow: hidden;
-      animation: riseIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-      transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
-    }
-
-    .panel:nth-child(1) { animation-delay: 0.12s; }
-    .panel:nth-child(2) { animation-delay: 0.22s; }
-    .panel:nth-child(3) { animation-delay: 0.32s; }
-    .panel:nth-child(4) { animation-delay: 0.42s; }
-
-    .panel:hover {
-      transform: translateY(-4px);
-      border-color: rgba(26, 86, 219, 0.4);
-      box-shadow: 0 22px 48px rgba(11, 42, 111, 0.14);
-    }
-
-    .panel::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--navy), var(--blue), var(--blue-soft), #ffffff);
-    }
-
-    .panel::after {
-      content: "";
-      position: absolute;
-      inset: auto -20% -40% auto;
-      width: 55%;
-      height: 70%;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.16), transparent 70%);
-      pointer-events: none;
-    }
-
-    .rank {
-      position: absolute;
-      top: 1rem;
-      right: 1.1rem;
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 2.4rem;
-      line-height: 1;
-      color: rgba(26, 86, 219, 0.1);
-      letter-spacing: 0.04em;
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 14px;
+      padding: 1.25rem 1.35rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
 
     .team {
-      position: relative;
-      font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(2rem, 5vw, 2.75rem);
-      letter-spacing: 0.06em;
-      color: var(--navy);
-      margin-bottom: 1.35rem;
-    }
-
-    .stats {
-      position: relative;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.85rem;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      color: var(--accent);
     }
 
     .stat {
-      padding: 0.9rem 0.85rem;
-      background: var(--ice);
-      border: 1px solid rgba(26, 86, 219, 0.1);
-      border-radius: 2px;
-    }
-
-    .stat-label {
-      display: block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.4rem 0;
       color: var(--muted);
-      margin-bottom: 0.35rem;
+      border-top: 1px solid rgba(148, 163, 184, 0.15);
     }
 
-    .stat-value {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(2.2rem, 6vw, 3rem);
-      line-height: 1;
-      letter-spacing: 0.04em;
-      color: var(--blue);
+    .stat:first-of-type { border-top: none; }
+
+    .value {
+      color: var(--text);
+      font-weight: 700;
       font-variant-numeric: tabular-nums;
     }
 
-    .stat:nth-child(2) .stat-value {
-      color: var(--navy);
-    }
-
     .empty {
-      grid-column: 1 / -1;
       text-align: center;
-      padding: 3rem 1rem;
       color: var(--muted);
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    @keyframes riseIn {
-      from {
-        opacity: 0;
-        transform: translateY(28px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 520px) {
-      .stats { grid-template-columns: 1fr; }
+      padding: 2rem 1rem;
     }
   </style>
 </head>
 <body>
-  <div class="stage">
-    <div class="glow glow-a" aria-hidden="true"></div>
-    <div class="glow glow-b" aria-hidden="true"></div>
-
-    <header class="brand">
+  <div class="wrap">
+    <header>
       <div class="brand-mark">LVB</div>
       <p class="brand-sub">Scoreboard</p>
       <button type="button" class="refresh-btn" id="refreshBtn">Refresh</button>
@@ -349,21 +189,12 @@
 
       boardEl.innerHTML = rows
         .map(
-          ({ team, visitors, inductions }, index) => `
-        <article class="panel">
-          <span class="rank">0${index + 1}</span>
-          <h2 class="team">${escapeHtml(team)}</h2>
-          <div class="stats">
-            <div class="stat">
-              <span class="stat-label">Visitors</span>
-              <span class="stat-value">${escapeHtml(visitors)}</span>
-            </div>
-            <div class="stat">
-              <span class="stat-label">Inductions</span>
-              <span class="stat-value">${escapeHtml(inductions)}</span>
-            </div>
-          </div>
-        </article>`
+          ({ team, visitors, inductions }) => `
+        <div class="card">
+          <div class="team">${escapeHtml(team)}</div>
+          <div class="stat">Visitors <span class="value">${escapeHtml(visitors)}</span></div>
+          <div class="stat">Inductions <span class="value">${escapeHtml(inductions)}</span></div>
+        </div>`
         )
         .join("");
     }
