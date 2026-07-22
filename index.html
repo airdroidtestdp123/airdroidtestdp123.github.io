@@ -66,11 +66,20 @@
       border: 1px solid rgba(148, 163, 184, 0.35);
       background: var(--panel);
       color: var(--text);
-      font: inherit;
-      font-weight: 600;
-      padding: 0.55rem 1.15rem;
-      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 50%;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .refresh-btn svg {
+      width: 22px;
+      height: 22px;
+      display: block;
     }
 
     .refresh-btn:hover {
@@ -81,6 +90,14 @@
     .refresh-btn:disabled {
       opacity: 0.65;
       cursor: wait;
+    }
+
+    .refresh-btn.is-loading svg {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     #scoreboard {
@@ -133,7 +150,12 @@
     <header>
       <div class="brand-mark">LVB</div>
       <p class="brand-sub">Scoreboard</p>
-      <button type="button" class="refresh-btn" id="refreshBtn">Refresh</button>
+      <button type="button" class="refresh-btn" id="refreshBtn" aria-label="Refresh" title="Refresh">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.6-6.4" />
+          <polyline points="21 3 21 9 15 9" />
+        </svg>
+      </button>
     </header>
 
     <div id="scoreboard" aria-live="polite"></div>
@@ -201,7 +223,7 @@
 
     async function loadData() {
       refreshBtn.disabled = true;
-      refreshBtn.textContent = "Loading…";
+      refreshBtn.classList.add("is-loading");
 
       try {
         const res = await fetch(API_URL, { cache: "no-store" });
@@ -213,7 +235,7 @@
         boardEl.innerHTML = '<div class="empty">Unable to load scores</div>';
       } finally {
         refreshBtn.disabled = false;
-        refreshBtn.textContent = "Refresh";
+        refreshBtn.classList.remove("is-loading");
       }
     }
 
