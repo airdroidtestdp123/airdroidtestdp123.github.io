@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LVB Scoreboard</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #4ade80;
+      --err: #f87171;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at top, #1e3a5f 0%, transparent 55%),
+        var(--bg);
+      padding: 2rem 1.25rem 3rem;
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    h1 {
+      margin: 0 0 0.35rem;
+      font-size: clamp(1.75rem, 4vw, 2.4rem);
+      letter-spacing: 0.02em;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .status.ok { color: var(--ok); }
+    .status.err { color: var(--err); }
+
+    #scoreboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 14px;
+      padding: 1.25rem 1.35rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .team {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      color: var(--accent);
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.4rem 0;
+      color: var(--muted);
+      border-top: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .stat:first-of-type { border-top: none; }
+
+    .value {
+      color: var(--text);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hint {
+      margin-top: 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    code {
+      background: rgba(148, 163, 184, 0.15);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>LVB Scoreboard</h1>
+      <p id="status" class="status">Loading…</p>
+    </header>
+
+    <div id="scoreboard"></div>
+
+    <p class="hint">
+      Paste your Google Sheets <strong>Publish to web → CSV</strong> URL into
+      <code>API_URL</code> in this file. Updates every 10 seconds.
+    </p>
+  </div>
+
+  <script>
+    // STEP 1: Publish sheet as CSV (File → Share → Publish to web → CSV)
+    // STEP 2: Paste that URL here:
+    const API_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOcaFZv-1fupAcEYjXFCUUMQCr4rsMGWvWqAkKP2U_oQOQ9cT59_WbfKf55huSp1U1s6S3kebVe2i4/pub?output=csv";
+
+    // Falls back to local sample.csv until you paste a real published URL
+    const FALLBACK_URL = "sample.csv";
+    const REFRESH_MS = 10000;
+
+    const statusEl = document.getElementById("status");
+    const boardEl = document.getElementById("scoreboard");
+
+    function splitCsvLine(line) {
+      // Handles commas inside quoted values
+      return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map((cell) =>
+        cell.trim().replace(/^"|"$/g, "").replace(/""/g, '"')
+      );
+    }
+
+    function setStatus(text, type) {
+      statusEl.textContent = text;
+      statusEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function renderRows(rows) {
+      if (!rows.length) {
+        boardEl.innerHTML = '<div class="card"><div class="team">No data</div></div>';
+        return;
+      }
+
+      boardEl.innerHTML = rows
+        .map(
+          ({ team, visitors, inductions }) => `
+        <div class="card">
+          <div class="team">${escapeHtml(team)}</div>
+          <div class="stat">Visitors <span class="value">${escapeHtml(visitors)}</span></div>
+          <div class="stat">Inductions <span class="value">${escapeHtml(inductions)}</span></div>
+        </div>`
+        )
+        .join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function parseCsv(csv) {
+      const lines = csv.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+      const rows = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        const cols = splitCsvLine(line);
+        const [team, visitors, inductions] = cols;
+        if (!team) continue;
+
+        rows.push({
+          team: team || "",
+          visitors: visitors || "0",
+          inductions: inductions || "0",
+        });
+      }
+
+      return rows;
+    }
+
+    async function fetchCsv(url) {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.text();
+    }
+
+    async function loadData() {
+      const usePublished = API_URL && API_URL !== "PASTE_CSV_URL";
+      const url = usePublished ? API_URL : FALLBACK_URL;
+
+      try {
+        const csv = await fetchCsv(url);
+        const rows = parseCsv(csv);
+        renderRows(rows);
+        const when = new Date().toLocaleTimeString();
+        setStatus(
+          usePublished
+            ? `Live from Google Sheets · updated ${when}`
+            : `Using sample.csv · paste published CSV URL into API_URL · ${when}`,
+          "ok"
+        );
+      } catch (err) {
+        console.error(err);
+        setStatus("Failed to load data: " + err.message, "err");
+      }
+    }
+
+    loadData();
+    setInterval(loadData, REFRESH_MS);
+  </script>
+</body>
+</html>
