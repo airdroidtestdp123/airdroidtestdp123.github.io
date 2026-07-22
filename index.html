@@ -9,15 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #071a1f;
-      --ink-soft: #0d2c33;
-      --foam: #f4f7f5;
-      --mist: #c5d5d0;
-      --gold: #e8b84a;
-      --gold-soft: #f0d48a;
-      --teal: #1fa8a0;
-      --teal-deep: #0e6e6a;
-      --coral: #ff6b4a;
+      --navy: #0b2a6f;
+      --blue: #1a56db;
+      --blue-bright: #3b82f6;
+      --blue-soft: #60a5fa;
+      --ice: #e8f1ff;
+      --white: #ffffff;
+      --ink: #0f274f;
+      --muted: #5b7399;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,8 +24,8 @@
     body {
       min-height: 100vh;
       font-family: "Figtree", sans-serif;
-      color: var(--foam);
-      background: var(--ink);
+      color: var(--ink);
+      background: var(--white);
       overflow-x: hidden;
     }
 
@@ -39,10 +38,10 @@
       align-items: center;
       justify-content: center;
       background:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(31, 168, 160, 0.35), transparent 55%),
-        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(232, 184, 74, 0.18), transparent 50%),
-        radial-gradient(ellipse 40% 35% at 0% 80%, rgba(255, 107, 74, 0.12), transparent 45%),
-        linear-gradient(165deg, #041216 0%, #0a242b 45%, #071a1f 100%);
+        radial-gradient(ellipse 70% 50% at 50% -5%, rgba(59, 130, 246, 0.22), transparent 55%),
+        radial-gradient(ellipse 45% 35% at 100% 100%, rgba(11, 42, 111, 0.1), transparent 50%),
+        radial-gradient(ellipse 40% 30% at 0% 90%, rgba(96, 165, 250, 0.16), transparent 45%),
+        linear-gradient(180deg, #ffffff 0%, #f3f7ff 48%, #eaf1ff 100%);
     }
 
     .stage::before {
@@ -50,8 +49,8 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(244, 247, 245, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(244, 247, 245, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(26, 86, 219, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 86, 219, 0.05) 1px, transparent 1px);
       background-size: 48px 48px;
       mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
       pointer-events: none;
@@ -69,7 +68,7 @@
       height: 42vmin;
       border-radius: 50%;
       filter: blur(80px);
-      opacity: 0.35;
+      opacity: 0.28;
       pointer-events: none;
       animation: floatGlow 12s ease-in-out infinite;
     }
@@ -77,13 +76,13 @@
     .glow-a {
       top: 8%;
       left: 12%;
-      background: var(--teal);
+      background: var(--blue-bright);
     }
 
     .glow-b {
       bottom: 10%;
       right: 8%;
-      background: var(--gold);
+      background: var(--navy);
       animation-delay: -4s;
     }
 
@@ -106,11 +105,11 @@
       font-size: clamp(4.5rem, 14vw, 8.5rem);
       line-height: 0.9;
       letter-spacing: 0.08em;
-      background: linear-gradient(135deg, var(--foam) 10%, var(--gold-soft) 45%, var(--gold) 70%, var(--teal) 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #dbeafe 28%, var(--blue-soft) 55%, var(--blue) 78%, var(--navy) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 60px rgba(232, 184, 74, 0.25);
+      filter: drop-shadow(0 8px 24px rgba(26, 86, 219, 0.28));
     }
 
     .brand-sub {
@@ -119,7 +118,7 @@
       font-weight: 600;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--mist);
+      color: var(--blue);
     }
 
     #scoreboard {
@@ -135,13 +134,12 @@
       position: relative;
       padding: 1.75rem 1.6rem 1.5rem;
       border-radius: 4px;
-      background:
-        linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
-      border: 1px solid rgba(244, 247, 245, 0.12);
-      backdrop-filter: blur(12px);
+      background: linear-gradient(160deg, #ffffff 0%, #f7faff 100%);
+      border: 1px solid rgba(26, 86, 219, 0.14);
+      box-shadow: 0 18px 40px rgba(11, 42, 111, 0.08);
       overflow: hidden;
       animation: riseIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-      transition: transform 0.35s ease, border-color 0.35s ease;
+      transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
     }
 
     .panel:nth-child(1) { animation-delay: 0.12s; }
@@ -151,7 +149,8 @@
 
     .panel:hover {
       transform: translateY(-4px);
-      border-color: rgba(232, 184, 74, 0.45);
+      border-color: rgba(26, 86, 219, 0.4);
+      box-shadow: 0 22px 48px rgba(11, 42, 111, 0.14);
     }
 
     .panel::before {
@@ -161,7 +160,7 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: linear-gradient(90deg, var(--teal), var(--gold), var(--coral));
+      background: linear-gradient(90deg, var(--navy), var(--blue), var(--blue-soft), #ffffff);
     }
 
     .panel::after {
@@ -170,7 +169,7 @@
       inset: auto -20% -40% auto;
       width: 55%;
       height: 70%;
-      background: radial-gradient(circle, rgba(31, 168, 160, 0.2), transparent 70%);
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.16), transparent 70%);
       pointer-events: none;
     }
 
@@ -181,7 +180,7 @@
       font-family: "Bebas Neue", sans-serif;
       font-size: 2.4rem;
       line-height: 1;
-      color: rgba(244, 247, 245, 0.08);
+      color: rgba(26, 86, 219, 0.1);
       letter-spacing: 0.04em;
     }
 
@@ -190,7 +189,7 @@
       font-family: "Bebas Neue", sans-serif;
       font-size: clamp(2rem, 5vw, 2.75rem);
       letter-spacing: 0.06em;
-      color: var(--foam);
+      color: var(--navy);
       margin-bottom: 1.35rem;
     }
 
@@ -203,8 +202,8 @@
 
     .stat {
       padding: 0.9rem 0.85rem;
-      background: rgba(4, 18, 22, 0.45);
-      border: 1px solid rgba(244, 247, 245, 0.08);
+      background: var(--ice);
+      border: 1px solid rgba(26, 86, 219, 0.1);
       border-radius: 2px;
     }
 
@@ -214,7 +213,7 @@
       font-weight: 700;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--mist);
+      color: var(--muted);
       margin-bottom: 0.35rem;
     }
 
@@ -223,19 +222,19 @@
       font-size: clamp(2.2rem, 6vw, 3rem);
       line-height: 1;
       letter-spacing: 0.04em;
-      color: var(--gold);
+      color: var(--blue);
       font-variant-numeric: tabular-nums;
     }
 
     .stat:nth-child(2) .stat-value {
-      color: var(--teal);
+      color: var(--navy);
     }
 
     .empty {
       grid-column: 1 / -1;
       text-align: center;
       padding: 3rem 1rem;
-      color: var(--mist);
+      color: var(--muted);
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
