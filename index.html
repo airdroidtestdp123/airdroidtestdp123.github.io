@@ -4,76 +4,143 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LVB Scoreboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
       --lvb-blue: #0a4a6e;
       --lvb-blue-top: #17628a;
+      --deep: #062636;
+      --foam: #f5f9fc;
+      --ink: #0c2b3d;
+      --muted: #5d7a8c;
+      --line: rgba(10, 74, 110, 0.14);
+      --glow: rgba(23, 98, 138, 0.28);
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      margin: 0;
       min-height: 100vh;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      color: var(--text);
+      font-family: "Manrope", sans-serif;
+      color: var(--ink);
+      background: var(--foam);
+      overflow-x: hidden;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 100vh;
+      padding: clamp(1.5rem, 4vw, 3.25rem);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       background:
-        radial-gradient(ellipse at top, #1e3a5f 0%, transparent 55%),
-        var(--bg);
-      padding: 2rem 1.25rem 3rem;
+        radial-gradient(ellipse 90% 55% at 50% -5%, rgba(23, 98, 138, 0.28), transparent 58%),
+        radial-gradient(ellipse 40% 35% at 0% 100%, rgba(10, 74, 110, 0.12), transparent 50%),
+        radial-gradient(ellipse 35% 30% at 100% 80%, rgba(23, 98, 138, 0.1), transparent 48%),
+        linear-gradient(180deg, #ffffff 0%, #eef5f9 42%, #e4eef5 100%);
     }
 
-    .wrap {
-      max-width: 900px;
-      margin: 0 auto;
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(10, 74, 110, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(10, 74, 110, 0.045) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at center, black 25%, transparent 78%);
+      pointer-events: none;
+      animation: gridDrift 30s linear infinite;
     }
 
-    header {
+    @keyframes gridDrift {
+      from { background-position: 0 0, 0 0; }
+      to { background-position: 56px 56px, 56px 56px; }
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      pointer-events: none;
+      animation: floatOrb 14s ease-in-out infinite;
+    }
+
+    .orb-a {
+      width: 38vmin;
+      height: 38vmin;
+      top: 6%;
+      left: 8%;
+      background: rgba(23, 98, 138, 0.35);
+    }
+
+    .orb-b {
+      width: 32vmin;
+      height: 32vmin;
+      right: 6%;
+      bottom: 8%;
+      background: rgba(10, 74, 110, 0.22);
+      animation-delay: -5s;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(3%, -5%) scale(1.07); }
+    }
+
+    .brand {
+      position: relative;
+      z-index: 1;
       text-align: center;
-      margin-bottom: 1.75rem;
+      margin-bottom: clamp(1.75rem, 4vw, 3rem);
+      animation: riseIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .brand-mark {
       display: inline-block;
-      margin: 0 auto 0.85rem;
-      padding: 0.55rem 1.6rem 0.45rem;
-      font-size: clamp(2.8rem, 8vw, 4.2rem);
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      line-height: 1;
+      padding: 0.7rem 2rem 0.55rem;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(3.6rem, 12vw, 7rem);
+      letter-spacing: 0.14em;
+      line-height: 0.92;
       color: #ffffff;
       background:
-        radial-gradient(ellipse 120% 80% at 50% -20%, var(--lvb-blue-top) 0%, transparent 55%),
+        radial-gradient(ellipse 130% 90% at 50% -30%, var(--lvb-blue-top) 0%, transparent 58%),
         var(--lvb-blue);
-      border-radius: 2px;
+      box-shadow:
+        0 18px 40px rgba(6, 38, 54, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      border-radius: 3px;
     }
 
     .brand-sub {
-      margin: 0 0 1rem;
-      color: var(--muted);
-      font-size: 0.95rem;
-      letter-spacing: 0.12em;
+      margin: 0.9rem 0 1.15rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.38em;
       text-transform: uppercase;
+      color: var(--lvb-blue);
     }
 
     .refresh-btn {
       appearance: none;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      background: var(--panel);
-      color: var(--text);
-      width: 44px;
-      height: 44px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+      color: var(--lvb-blue);
+      width: 48px;
+      height: 48px;
       padding: 0;
       border-radius: 50%;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 10px 24px rgba(6, 38, 54, 0.08);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     }
 
     .refresh-btn svg {
@@ -83,13 +150,15 @@
     }
 
     .refresh-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+      transform: translateY(-2px);
+      border-color: rgba(10, 74, 110, 0.35);
+      box-shadow: 0 14px 30px rgba(6, 38, 54, 0.14);
     }
 
     .refresh-btn:disabled {
-      opacity: 0.65;
+      opacity: 0.7;
       cursor: wait;
+      transform: none;
     }
 
     .refresh-btn.is-loading svg {
@@ -101,53 +170,145 @@
     }
 
     #scoreboard {
+      position: relative;
+      z-index: 1;
+      width: min(980px, 100%);
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: clamp(1rem, 2.5vw, 1.6rem);
     }
 
     .card {
-      background: var(--panel);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      border-radius: 14px;
-      padding: 1.25rem 1.35rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      position: relative;
+      padding: 1.7rem 1.55rem 1.45rem;
+      background: linear-gradient(165deg, #ffffff 0%, #f7fbfe 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 20px 45px rgba(6, 38, 54, 0.08);
+      overflow: hidden;
+      animation: riseIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 28px 55px rgba(6, 38, 54, 0.14);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--deep), var(--lvb-blue), var(--lvb-blue-top));
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      right: -18%;
+      bottom: -35%;
+      width: 55%;
+      height: 70%;
+      background: radial-gradient(circle, var(--glow), transparent 70%);
+      pointer-events: none;
+    }
+
+    .rank {
+      position: absolute;
+      top: 1rem;
+      right: 1.15rem;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 2.5rem;
+      line-height: 1;
+      color: rgba(10, 74, 110, 0.08);
+      letter-spacing: 0.04em;
     }
 
     .team {
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin-bottom: 0.85rem;
-      color: var(--accent);
+      position: relative;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(2.1rem, 5vw, 2.8rem);
+      letter-spacing: 0.06em;
+      color: var(--deep);
+      margin-bottom: 1.25rem;
+    }
+
+    .stats {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
     }
 
     .stat {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 0.4rem 0;
-      color: var(--muted);
-      border-top: 1px solid rgba(148, 163, 184, 0.15);
+      padding: 0.95rem 0.9rem;
+      background: rgba(10, 74, 110, 0.05);
+      border: 1px solid var(--line);
+      border-radius: 12px;
     }
 
-    .stat:first-of-type { border-top: none; }
+    .stat-label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
 
     .value {
-      color: var(--text);
-      font-weight: 700;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(2.2rem, 6vw, 3rem);
+      line-height: 1;
+      letter-spacing: 0.04em;
+      color: var(--lvb-blue);
       font-variant-numeric: tabular-nums;
     }
 
+    .stat:nth-child(2) .value {
+      color: var(--deep);
+    }
+
     .empty {
+      grid-column: 1 / -1;
       text-align: center;
+      padding: 3rem 1rem;
       color: var(--muted);
-      padding: 2rem 1rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    @keyframes riseIn {
+      from {
+        opacity: 0;
+        transform: translateY(26px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 520px) {
+      .stats { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
+  <div class="stage">
+    <div class="orb orb-a" aria-hidden="true"></div>
+    <div class="orb orb-b" aria-hidden="true"></div>
+
+    <header class="brand">
       <div class="brand-mark">LVB</div>
       <p class="brand-sub">Scoreboard</p>
       <button type="button" class="refresh-btn" id="refreshBtn" aria-label="Refresh" title="Refresh">
@@ -211,12 +372,21 @@
 
       boardEl.innerHTML = rows
         .map(
-          ({ team, visitors, inductions }) => `
-        <div class="card">
-          <div class="team">${escapeHtml(team)}</div>
-          <div class="stat">Visitors <span class="value">${escapeHtml(visitors)}</span></div>
-          <div class="stat">Inductions <span class="value">${escapeHtml(inductions)}</span></div>
-        </div>`
+          ({ team, visitors, inductions }, index) => `
+        <article class="card">
+          <span class="rank">0${index + 1}</span>
+          <h2 class="team">${escapeHtml(team)}</h2>
+          <div class="stats">
+            <div class="stat">
+              <span class="stat-label">Visitors</span>
+              <span class="value">${escapeHtml(visitors)}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Inductions</span>
+              <span class="value">${escapeHtml(inductions)}</span>
+            </div>
+          </div>
+        </article>`
         )
         .join("");
     }
