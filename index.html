@@ -369,6 +369,7 @@
 
     let activeRequest = 0;
     let abortController = null;
+    let lastGoodCsv = null;
 
     function splitCsvLine(line) {
       return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map((cell) =>
@@ -434,9 +435,67 @@
     }
 
     function sheetUrl() {
-      // Bust browser/CDN cache so each Refresh gets the latest published CSV
       const sep = API_URL.includes("?") ? "&" : "?";
       return `${API_URL}${sep}cb=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    }
+
+    function normalizeCsv(csv) {
+      return String(csv || "").replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim();
+    }
+
+    function pickReliableCsv(samples) {
+      const counts = new Map();
+      for (const sample of samples) {
+        const key = normalizeCsv(sample);
+        if (!key || !/^team\s*,/i.test(key.split("\n")[0] || "")) continue;
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }
+
+      let best = null;
+      let bestCount = 0;
+      for (const [csv, count] of counts) {
+        if (count > bestCount) {
+          best = csv;
+          bestCount = count;
+        }
+      }
+
+      // Need agreement from at least 2 responses to avoid a single stale CDN node
+      if (best && bestCount >= 2) return best;
+      return null;
+    }
+
+    async function fetchSheetCsv(signal) {
+      // Google "Publish to web" CSV is served from multiple CDN edges that
+      // often disagree. Fetch several copies and keep the majority result.
+      const requests = Array.from({ length: 5 }, () =>
+        fetch(sheetUrl(), {
+          cache: "no-store",
+          signal,
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        }).then(async (res) => {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.text();
+        })
+      );
+
+      const settled = await Promise.allSettled(requests);
+      const samples = settled
+        .filter((item) => item.status === "fulfilled")
+        .map((item) => item.value);
+
+      if (!samples.length) throw new Error("No sheet response");
+
+      const majority = pickReliableCsv(samples);
+      if (majority) return majority;
+
+      // No consensus yet — keep previous good data if we have it
+      if (lastGoodCsv) return lastGoodCsv;
+
+      return normalizeCsv(samples[0]);
     }
 
     async function loadData() {
@@ -448,24 +507,19 @@
       refreshBtn.classList.add("is-loading");
 
       try {
-        const res = await fetch(sheetUrl(), {
-          cache: "no-store",
-          signal: abortController.signal,
-          headers: {
-            "Cache-Control": "no-cache",
-            Pragma: "no-cache",
-          },
-        });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-
-        const csv = await res.text();
-        if (requestId !== activeRequest) return; // ignore outdated response
+        const csv = await fetchSheetCsv(abortController.signal);
+        if (requestId !== activeRequest) return;
+        lastGoodCsv = csv;
         renderRows(parseCsv(csv));
       } catch (err) {
         if (err.name === "AbortError") return;
         console.error(err);
         if (requestId !== activeRequest) return;
-        boardEl.innerHTML = '<div class="empty">Unable to load scores</div>';
+        if (lastGoodCsv) {
+          renderRows(parseCsv(lastGoodCsv));
+        } else {
+          boardEl.innerHTML = '<div class="empty">Unable to load scores</div>';
+        }
       } finally {
         if (requestId === activeRequest) {
           refreshBtn.disabled = false;
