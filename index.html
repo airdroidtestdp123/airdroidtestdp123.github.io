@@ -121,6 +121,35 @@
       color: var(--blue);
     }
 
+    .refresh-btn {
+      margin-top: 1.25rem;
+      appearance: none;
+      border: 1px solid rgba(26, 86, 219, 0.28);
+      background: linear-gradient(180deg, #ffffff 0%, #eef4ff 100%);
+      color: var(--navy);
+      font-family: "Figtree", sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.7rem 1.4rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 8px 20px rgba(11, 42, 111, 0.08);
+    }
+
+    .refresh-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(26, 86, 219, 0.55);
+      box-shadow: 0 12px 28px rgba(11, 42, 111, 0.14);
+    }
+
+    .refresh-btn:disabled {
+      opacity: 0.65;
+      cursor: wait;
+      transform: none;
+    }
+
     #scoreboard {
       position: relative;
       z-index: 1;
@@ -264,6 +293,7 @@
     <header class="brand">
       <div class="brand-mark">LVB</div>
       <p class="brand-sub">Scoreboard</p>
+      <button type="button" class="refresh-btn" id="refreshBtn">Refresh</button>
     </header>
 
     <div id="scoreboard" aria-live="polite"></div>
@@ -271,10 +301,9 @@
 
   <script>
     const API_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOcaFZv-1fupAcEYjXFCUUMQCr4rsMGWvWqAkKP2U_oQOQ9cT59_WbfKf55huSp1U1s6S3kebVe2i4/pub?output=csv";
-    const FALLBACK_URL = "sample.csv";
-    const REFRESH_MS = 10000;
 
     const boardEl = document.getElementById("scoreboard");
+    const refreshBtn = document.getElementById("refreshBtn");
 
     function splitCsvLine(line) {
       return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map((cell) =>
@@ -340,22 +369,25 @@
     }
 
     async function loadData() {
-      const usePublished = API_URL && API_URL !== "PASTE_CSV_URL";
-      const url = usePublished ? API_URL : FALLBACK_URL;
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = "Loading…";
 
       try {
-        const res = await fetch(url, { cache: "no-store" });
+        const res = await fetch(API_URL, { cache: "no-store" });
         if (!res.ok) throw new Error("HTTP " + res.status);
         const csv = await res.text();
         renderRows(parseCsv(csv));
       } catch (err) {
         console.error(err);
         boardEl.innerHTML = '<div class="empty">Unable to load scores</div>';
+      } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = "Refresh";
       }
     }
 
+    refreshBtn.addEventListener("click", loadData);
     loadData();
-    setInterval(loadData, REFRESH_MS);
   </script>
 </body>
 </html>
