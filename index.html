@@ -102,11 +102,11 @@
 
     .brand-mark {
       display: inline-block;
-      padding: 0.7rem 2rem 0.55rem;
+      padding: 0.85rem 2.4rem 0.7rem;
       font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(3.6rem, 12vw, 7rem);
+      font-size: clamp(5.5rem, 18vw, 10rem);
       letter-spacing: 0.14em;
-      line-height: 0.92;
+      line-height: 0.9;
       color: #ffffff;
       background:
         radial-gradient(ellipse 130% 90% at 50% -30%, var(--lvb-blue-top) 0%, transparent 58%),
@@ -118,7 +118,7 @@
     }
 
     .brand-sub {
-      margin: 0.9rem 0 1.15rem;
+      margin: 0.9rem 0 1.35rem;
       font-size: 0.82rem;
       font-weight: 700;
       letter-spacing: 0.38em;
@@ -126,39 +126,65 @@
       color: var(--lvb-blue);
     }
 
+    .refresh-wrap {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .refresh-hint {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--deep);
+      letter-spacing: 0.02em;
+    }
+
+    .refresh-hint span {
+      color: var(--lvb-blue);
+    }
+
     .refresh-btn {
       appearance: none;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.85);
+      border: 2px solid rgba(10, 74, 110, 0.28);
+      background: #ffffff;
       color: var(--lvb-blue);
-      width: 48px;
-      height: 48px;
-      padding: 0;
-      border-radius: 50%;
+      min-width: 168px;
+      height: 52px;
+      padding: 0 1.1rem;
+      border-radius: 999px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 10px 24px rgba(6, 38, 54, 0.08);
+      gap: 0.55rem;
+      font-family: "Manrope", sans-serif;
+      font-size: 0.92rem;
+      font-weight: 800;
+      box-shadow: 0 12px 28px rgba(6, 38, 54, 0.12);
       transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      animation: pulseHint 2.2s ease-in-out infinite;
     }
 
     .refresh-btn svg {
       width: 22px;
       height: 22px;
       display: block;
+      flex-shrink: 0;
     }
 
     .refresh-btn:hover {
       transform: translateY(-2px);
-      border-color: rgba(10, 74, 110, 0.35);
-      box-shadow: 0 14px 30px rgba(6, 38, 54, 0.14);
+      border-color: rgba(10, 74, 110, 0.5);
+      box-shadow: 0 16px 34px rgba(6, 38, 54, 0.16);
+      animation: none;
     }
 
     .refresh-btn:disabled {
       opacity: 0.7;
       cursor: wait;
       transform: none;
+      animation: none;
     }
 
     .refresh-btn.is-loading svg {
@@ -167,6 +193,15 @@
 
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulseHint {
+      0%, 100% {
+        box-shadow: 0 12px 28px rgba(6, 38, 54, 0.12), 0 0 0 0 rgba(23, 98, 138, 0.35);
+      }
+      50% {
+        box-shadow: 0 12px 28px rgba(6, 38, 54, 0.12), 0 0 0 10px rgba(23, 98, 138, 0);
+      }
     }
 
     #scoreboard {
@@ -311,12 +346,16 @@
     <header class="brand">
       <div class="brand-mark">LVB</div>
       <p class="brand-sub">Scoreboard</p>
-      <button type="button" class="refresh-btn" id="refreshBtn" aria-label="Refresh" title="Refresh">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-2.6-6.4" />
-          <polyline points="21 3 21 9 15 9" />
-        </svg>
-      </button>
+      <div class="refresh-wrap">
+        <p class="refresh-hint">Press <span>Refresh</span> for the latest scores</p>
+        <button type="button" class="refresh-btn" id="refreshBtn" aria-label="Refresh scores" title="Refresh scores">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.6-6.4" />
+            <polyline points="21 3 21 9 15 9" />
+          </svg>
+          Refresh
+        </button>
+      </div>
     </header>
 
     <div id="scoreboard" aria-live="polite"></div>
